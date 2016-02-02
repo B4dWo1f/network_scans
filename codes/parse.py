@@ -25,18 +25,17 @@ def check_scanned(fname):
    """
      Check if the host has been already scanned
    """
-   scanned = False
    try:
       for line in open(fname):
          if "(1 host up)" in line:
-            scanned = True
-            break
-   except IOError:
-      scanned = False
-   return scanned
+            return True
+   except IOError: return False
+   return False
 
 
 fname = '../uam/uam.hosts'
+path_out = '../test/'
+
 
 lines = open(fname,'r').read().splitlines()
 
@@ -46,15 +45,11 @@ for l in lines:
       IPs.append(l.split()[-1].replace('(','').replace(')',''))
 
 
-#mypath = '../test/'
-path_out = '../uam/db/'
-
-
-shuffle(IPs)
+shuffle(IPs)  # Random order
 
 for ip in IPs:
    ## check if already scanned
-   fname = path_out+ip+'.out'
+   fname = path_out + ip + '.out'
    if not check_scanned(fname):
       deep_scan(ip,OUT=path_out)
       tsleep = 10*random()   # Random waiting time
@@ -62,5 +57,5 @@ for ip in IPs:
       print '     Waiting %.5fs'%(tsleep)
       print '**************************'
       sleep(tsleep)
-   else:
-      print 'skipping:',ip
+   else: print 'skipping:',ip
+   if os.path.isfile('STOP'): exit()
